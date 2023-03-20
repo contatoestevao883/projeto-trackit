@@ -63,6 +63,7 @@ const Button = styled.button`
     border-style: none;
     margin-top: 5px;
     margin-bottom: 20px;
+    cursor: pointer;
 `
 
 const Span = styled.span`

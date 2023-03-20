@@ -7,18 +7,57 @@ import {
     buildStyles
   } from "react-circular-progressbar";
   import "react-circular-progressbar/dist/styles.css";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
+import axios from "axios";
+import Habits from "../components/Habit";
+import Days from "../components/Days";
 
   
 
 export default function Habitos(){
     const [display, setDisplay] = useState(false)
+    const [displayNewHabit, setDisplayNewHabit] = useState(false)
+    const [listOfHabits, setListOfHabits] = useState([])
+    const [days, setDays] = useState([])
+    const { newHabit, habit, setHabit } = useContext(AuthContext)
+    const token = window.localStorage.getItem("token")
     const percentage = 'Hoje';
     function toggle(){
         if(display === false){
             setDisplay(!display)
         }
     }
+    function hide(){
+        setDisplay(!display)
+    }
+
+    useEffect(() => {
+        async function loadHabit(){
+            const token = localStorage.getItem('token');
+            if(token){
+                try{
+                    const config = {
+                        headers : { 
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                    const promise = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits", config )
+                    const { data } = await axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits", config)
+                    console.log(data)
+                    setListOfHabits(data)
+                    setDisplayNewHabit(true)
+                    console.log(habit)
+                }catch(error){
+                    console.log(error.response.data.message)
+                    alert(error.response.data.details)
+                }
+            }
+         }
+         loadHabit()
+    }, [])
+
+
     return(
         <DivBox>
             <Header data-test="header">     
@@ -30,41 +69,39 @@ export default function Habitos(){
                 <Button onClick={toggle}>+</Button>
             </DivContainer>
             {display ? 
-            <DivBoxTable>
-                <DivTable display={display}>
-                    <InputTable />
+            <DivBoxTable onSubmit={newHabit}>
+                <DivTable>
+                    <InputTable value={habit} placeholder="nome do hábito" onChange={event => setHabit(event.target.value)}/>
                     <DivButton>
-                        <ButtonTable>D</ButtonTable>
-                        <ButtonTable>S</ButtonTable>
-                        <ButtonTable>T</ButtonTable>
-                        <ButtonTable>Q</ButtonTable>
-                        <ButtonTable>Q</ButtonTable>
-                        <ButtonTable>S</ButtonTable>
-                        <ButtonTable>S</ButtonTable>
+                        <Days days={days}/>
                     </DivButton>
+                    <DivTableSpan>
+                        <TableSpan onClick={hide}>Cancelar</TableSpan>
+                        <TableButton type="submit">Salvar</TableButton>
+                    </DivTableSpan>
                 </DivTable>
              </DivBoxTable>
              :
-             <DivBoxTable>
+             <DivBoxTable onSubmit={newHabit}> 
                 <DivTable2>
-                    <InputTable />
+                    <InputTable value={habit} placeholder="nome do hábito" onChange={event => setHabit(event.target.value)}/>
                     <DivButton>
-                        <ButtonTable>D</ButtonTable>
-                        <ButtonTable>S</ButtonTable>
-                        <ButtonTable>T</ButtonTable>
-                        <ButtonTable>Q</ButtonTable>
-                        <ButtonTable>Q</ButtonTable>
-                        <ButtonTable>S</ButtonTable>
-                        <ButtonTable>S</ButtonTable>
+                        <Days days={days}/>
                     </DivButton>
                 </DivTable2>
             </DivBoxTable>
             }
+            { listOfHabits.length > 0 ?
+            <TableHabit>
+                <Habits listOfHabits={listOfHabits} setListOfHabits={setListOfHabits}/>
+            </TableHabit>
+            :
             <Paragraph >Você não tem nenhum hábito 
               cadastrado ainda. Adicione um hábito 
               para começar a trackear!
             </Paragraph> 
             
+            }   
             {display ? 
             <Footer>
                 <HabitSpan>
@@ -178,6 +215,16 @@ const Paragraph = styled.p`
     height: 74px;
 
 `
+const Paragraph2 = styled.p`
+    display: none;
+    margin-left: 30px;
+    font-family: 'Lexend Deca';
+    color: #666666;
+    font-size: 18px;
+    margin-top: 20px;
+    width: 338px;
+    height: 74px;
+`
 const Footer = styled.footer`
     display: flex;
     justify-content:space-between;
@@ -219,10 +266,11 @@ const DivCircle = styled.div`
     border-radius: 100%;
 
 `
-const DivBoxTable = styled.div`
+const DivBoxTable = styled.form`
     display: flex;
     justify-content:center;
     margin-top:20px;
+    margin-bottom: 10px;
 `
 export const DivTable = styled.div`
     background-color: #FFFFFF;
@@ -242,9 +290,16 @@ const InputTable = styled.input`
     background: #FFFFFF;
     border: 1px solid #D5D5D5;
     border-radius: 5px;
+    ::placeholder{
+        color: #DBDBDB;
+        padding-left: 10px;
+        font-size:20px;
+        font-family: 'Lexend Deca';
+    }
 `
 const DivButton = styled.div`
     display: flex;
+    margin-left: 15px;
 `
 const ButtonTable = styled.button`
     margin-left: 5px;
@@ -256,4 +311,32 @@ const ButtonTable = styled.button`
     border: 1px solid #D5D5D5;
     border-radius: 5px;
     font-size: 20px;
+`
+const TableButton = styled.button`
+    width: 84px;
+    height: 35px;
+    font-family: 'Lexend Deca';
+    background: #52B6FF;
+    border-radius: 4.63636px;
+    font-size:16px;
+    border-style: none;
+    color: white;
+    margin-left: 20px;
+`
+const TableSpan = styled.span`
+    font-family: 'Lexend Deca';
+    font-size: 16px;
+    color: #52B6FF;
+
+`
+const DivTableSpan = styled.div`
+    margin-left: 150px;
+    margin-top: 10px;
+`
+const TableHabit = styled.div`
+    margin-left: 18px;
+    width: 340px;
+    height: 91px;
+    background: #FFFFFF;
+    border-radius: 5px;
 `

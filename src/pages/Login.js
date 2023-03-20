@@ -6,6 +6,7 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 
 export default function Login(){
+    const [loading, setLoading] = useState(false)
     const { signIn} = useContext(AuthContext)
     return(
         <DivContainer onSubmit={signIn}>
