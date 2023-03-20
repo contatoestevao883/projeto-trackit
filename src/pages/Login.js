@@ -1,19 +1,20 @@
 import logo from '../assets/logo.png'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
+import { useContext, useState } from 'react'
+import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 
 export default function Login(){
+    const { signIn} = useContext(AuthContext)
     return(
-        <DivContainer>
+        <DivContainer onSubmit={signIn}>
                 <Logo src={logo} />
-                <Input placeholder="email"/>
-                <Input placeholder="senha" />
-                <Button>Entrar</Button>
-                <Link to={"/cadastro"}>
+                <Input data-test="email-input" placeholder="email" required/>
+                <Input data-test="password-input" placeholder="senha" required/>
+                <Button data-test="login-btn" type="submit">Entrar</Button>
+                <Link data-test="signup-link" to={"/cadastro"}>
                     <Span>Não tem uma conta? Cadastre-se!</Span>
-                </Link>
-                <Link to={"/habitos"}>
-                    <Span>2</Span>
                 </Link>
         </DivContainer>
 
@@ -26,12 +27,12 @@ const Logo = styled.img`
     height: 200px;
     width: 220px;
 `
-const DivContainer = styled.div`
+const DivContainer = styled.form`
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
-    margin-top: 150px;
+    margin-top: 80px;
 `   
 const Input = styled.input`
     width: 303px;

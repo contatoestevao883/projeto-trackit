@@ -1,20 +1,26 @@
 import logo from '../assets/logo.png'
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
-export default function Cadastro(){
-    return(
-        <DivContainer>
-                <Logo src={logo} />
-                <Input placeholder="email"/>
-                <Input placeholder="senha" />
-                <Input placeholder="nome"/>
-                <Input placeholder="foto" />
-                <Button>Cadastrar</Button>
-                <Link to={"/"}>
-                    <Span>Já tem uma conta? Faça login!</Span>
-                </Link>
-        </DivContainer>
+import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { useContext, useEffect, useState } from 'react'
+import axios from 'axios'
+import { AuthContext } from '../context/AuthContext'
 
+export default function Cadastro(){
+    const [loading, setLoading] = useState(false)
+    const { signUp, nome, email, foto, senha, setEmail, setSenha, setNome, setFoto } = useContext(AuthContext)
+    
+    return(
+        <DivContainer onSubmit={signUp}>
+            <Logo src={logo} />
+            <Input data-test="email-input" type="email" value={email} placeholder="email" onChange={e => setEmail(e.target.value)} required disabled={loading}/>
+            <Input data-test="password-input" type="password" value={senha} placeholder="senha" onChange={e => setSenha(e.target.value)} required disabled={loading}/>
+            <Input data-test="user-name-input" type="text" value={nome} placeholder="nome" onChange={e => setNome(e.target.value)} required disabled={loading}/>
+            <Input data-test="user-image-input" type="text" value={foto} placeholder="foto" onChange={e => setFoto(e.target.value)} required disable={loading}/>
+            <Button data-test="signup-btn" type="submit">Cadastrar</Button>
+            <Link data-test="login-link" to={"/"}>
+                <Span>Já tem uma conta? Faça login!</Span>
+            </Link>
+        </DivContainer>
     )
 
 }
@@ -24,12 +30,12 @@ const Logo = styled.img`
     height: 200px;
     width: 220px;
 `
-const DivContainer = styled.div`
+const DivContainer = styled.form`
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
-    margin-top: 150px;
+    margin-top: 50px;
 `   
 const Input = styled.input`
     width: 303px;
